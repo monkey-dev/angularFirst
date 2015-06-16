@@ -1,0 +1,10 @@
+<div ng-controller="HomeCtrl as vm">
+	<div ng-model="user">
+		<h1>ESTOY EN EL HOME PAGE {{message}}</h1>
+		{{ 80/20 }}
+		<div> First Name: {{ user.firstName }}</div>
+		<div> Last Name: {{ user.lastName }}</div>
+
+	</div>
+	<button ng-click="selectDifficulty()">Go to difficulty</button>
+</div>

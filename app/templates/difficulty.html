@@ -1,0 +1,10 @@
+<div ng-controller="DifficultyCtrl">
+	<h1>ESTOY EN EL DIFFICULTY PAGE {{message}}</h1>
+	{{ 80/20 }}
+	<div class="list"  ng-repeat="difficultLvl in difficulty"> 
+	<a ng-click="letsPlay(difficultLvl.id)">
+		{{difficultLvl.name}}
+	</a>
+	</div>
+</div>
+<button ng-click="goHome()">Go to Home</button>
