@@ -2,6 +2,7 @@ app.controller('GameCtrl', ['$scope','$routeParams', 'dataSrvc', function ($scop
 	var elemntActive=0;
 	var diffLvl = Number($routeParams.difficultLvl);
 	var timeRunning = false;
+	$scope.cartFlipped=[];
 	$scope.difficulty = diffLvl;
 
 	var gridSize = 	dataApi.getGridInfo(diffLvl);
@@ -35,30 +36,75 @@ app.controller('GameCtrl', ['$scope','$routeParams', 'dataSrvc', function ($scop
 		restrict: 'A',
 		transclude:true,
 		controller: function($scope){
+			checkFlippedCarts = function(){
+				var cartsFlipped = $scope.cartFlipped.length;
+				return cartsFlipped;
+			};
+			addFlippedCart = function(e){
+				$scope.cartFlipped.push(e);
+				$scope.$apply();
+			};
+			compFlippedCart = function(){
+				var firstElement = $scope.cartFlipped[0][0];
+				var secondElement = $scope.cartFlipped[1][0];
+				console.log(firstElement.attributes.value.value);
+				if(firstElement.attributes.value.value == secondElement.attributes.value.value ){
+					return true;
+				}else{
+					return false;
+				}
+			};
+			openFlippedCarts = function(){
+				angular.forEach($scope.cartFlipped,function(item){
+					var el = angular.element(item[0]);
+					el.removeClass('cart-flipped').addClass('cart-open');
+					el.off('click');
+				});
+				$scope.cartFlipped=[];
+				$scope.$apply();
+				
+			};
+			turnDownCarts = function(){
+				angular.forEach($scope.cartFlipped,function(item){
+					var el = angular.element(item[0]);
+					el.removeClass('cart-flipped').addClass('cart-open');
+				});
+				$scope.cartFlipped=[];
+				$scope.$apply();
+			};
 			
 		},
-		template:'<div ng-model="gridSize" ng-repeat="grid in gridArray" id="cart{{$index}}" class="cart-down" >{{grid.signVal}}</div>',
-		link: function(scope, element, attr, cartFlipped){
-			console.log('liked myCarts')
+		templateUrl:'./app/templates/cart.html',
+		link: function(scope, element, attr){
+			element.on('click',function(event){
+				event.preventDefault();
+				var countFlipped = checkFlippedCarts();
+				
+				switch(countFlipped){
+					case 0:
+						element.removeClass('cart-down').addClass('cart-flipped');
+						addFlippedCart(element);
+					break;
+					case 1:
+						element.removeClass('cart-down').addClass('cart-flipped');
+						addFlippedCart(element);
+						var cartValidation = compFlippedCart();
+						if(cartValidation){
+							openFlippedCarts();
+						}else{
+							turnDownCarts();
+						}
+					break;
+					default:
+						turnDownCarts();
+					break;
+				}
+			});
 			
 		}
 	};
 	
 
-}])
-.directive('cartFlipped', [function () {
-	return {
-		restrict: 'C',
-		controller: function($scope){
-			
-		},
-		link: function(scope, element, attr){
-			console.log('liked cartsFlipped')
-			
-		}
-
-		
-	};
 }]);
 
 /*

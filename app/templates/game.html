@@ -4,7 +4,7 @@
 	<div ng-model="timerCount">YOUR TIME: {{ timerCount }} seconds</div>
 	
 	<div ng-click="timerStart()" >
-		<div my-carts  >
+		<div my-carts ng-model="gridSize" ng-repeat="grid in gridArray" id="cart{{$index}}" class="cart-down" ng-value="{{grid.signVal}}">
 			
 		</div >
 	</div>	
