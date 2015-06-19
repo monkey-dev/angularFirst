@@ -1,5 +1,5 @@
 
-app.factory('dataSrvc',function () {
+app.factory('dataSrvc',function ($http) {
 	var gridArray =[] ;
 	var gridMade= {};
 	var diffOptions =  JSON.parse('[{"name":"Beginner","id":1,"option":{"gridX":4,"gridY":4}},{"name":"Amateur","id":2,"option":{"gridX":4,"gridY":6}},{"name":"Pro","id":3,"option":{"gridX":4,"gridY":8}}]');
@@ -64,10 +64,16 @@ app.factory('dataSrvc',function () {
 		return arrayOrdered;
 	}
 
+	function addRecord(arrayShuffled, gridVals){
+		$http.get('./api/data/records.json').success(function(response){ return response;});
+		
+	}
+
 	return {
 		getDiffOptions: getDiffOptions,
 		makeGrid: makeGrid,
-		getGridInfo: getGridInfo
+		getGridInfo: getGridInfo,
+		addRecord : addRecord
 
 	}
 

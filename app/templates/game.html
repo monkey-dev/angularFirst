@@ -1,9 +1,9 @@
 <div ng-controller="GameCtrl">
 	<div title="GAME {{difficulty}}"> Let's Play!!!</div>
 	
-	<div ng-model="timerCount">YOUR TIME: {{ timerCount }} seconds</div>
+	<div ng-model="timerCount" ng-class="{'timer-running':(timerCount>0), 'timer-stopped':(timerCount<=0)}">YOUR TIME: {{ timerCount }} seconds</div>
 	
-	<div ng-click="timerStart()" >
+	<div ng-click="timeStart()" class="ng-cloak">
 		<div my-carts ng-model="gridSize" ng-repeat="grid in gridArray" id="cart{{$index}}" class="cart-down" ng-value="{{grid.signVal}}">
 			
 		</div >

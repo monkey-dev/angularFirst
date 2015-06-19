@@ -2,9 +2,9 @@ app.controller('GameCtrl', ['$scope','$routeParams', 'dataSrvc', function ($scop
 	var elemntActive=0;
 	var diffLvl = Number($routeParams.difficultLvl);
 	var timeRunning = false;
+	var intervalId = null;
 	$scope.cartFlipped=[];
 	$scope.difficulty = diffLvl;
-
 	var gridSize = 	dataApi.getGridInfo(diffLvl);
 	var gridMade = dataApi.makeGrid(gridSize.option);
 
@@ -12,17 +12,19 @@ app.controller('GameCtrl', ['$scope','$routeParams', 'dataSrvc', function ($scop
 	$scope.gridArray = gridMade;
 	$scope.timerCount =  0;
 	
-	$scope.timerStart = function(){
-		
+	$scope.timeStart = function(){
 		if(!timeRunning){
 			timeRunning = true;
 			startCounter();
 		}
 	};
 
-	
+	$scope.timeStop = function(){
+		console.log("se detiene el reloj"+intervalId);
+		window.clearInterval(intervalId);
+	};
 	function startCounter(){
-		setInterval(function(){
+		intervalId = setInterval(function(){
 			$scope.timerCount = $scope.timerCount+1;
 			$scope.$apply();
 		}, 1000);  
@@ -34,26 +36,30 @@ app.controller('GameCtrl', ['$scope','$routeParams', 'dataSrvc', function ($scop
 .directive('myCarts', [function () {
 	return {
 		restrict: 'A',
+		require:'',
 		transclude:true,
 		controller: function($scope){
+
 			checkFlippedCarts = function(){
 				var cartsFlipped = $scope.cartFlipped.length;
 				return cartsFlipped;
 			};
+
 			addFlippedCart = function(e){
 				$scope.cartFlipped.push(e);
 				$scope.$apply();
 			};
+
 			compFlippedCart = function(){
 				var firstElement = $scope.cartFlipped[0][0];
 				var secondElement = $scope.cartFlipped[1][0];
-				console.log(firstElement.attributes.value.value);
-				if(firstElement.attributes.value.value == secondElement.attributes.value.value ){
+				if(Number(firstElement.attributes.value.value) == Number(secondElement.attributes.value.value)){
 					return true;
 				}else{
 					return false;
 				}
 			};
+
 			openFlippedCarts = function(){
 				angular.forEach($scope.cartFlipped,function(item){
 					var el = angular.element(item[0]);
@@ -64,14 +70,24 @@ app.controller('GameCtrl', ['$scope','$routeParams', 'dataSrvc', function ($scop
 				$scope.$apply();
 				
 			};
+
 			turnDownCarts = function(){
 				angular.forEach($scope.cartFlipped,function(item){
 					var el = angular.element(item[0]);
-					el.removeClass('cart-flipped').addClass('cart-open');
+					el.removeClass('cart-flipped').addClass('cart-down');
 				});
 				$scope.cartFlipped=[];
 				$scope.$apply();
 			};
+
+			gameFinished = function(){
+				var result = document.getElementsByClassName("cart-down");
+				if(result.length>0){return false;}else{return true;}
+				
+			};
+			stopTimer= function(){
+				$scope.timeStop();
+			}
 			
 		},
 		templateUrl:'./app/templates/cart.html',
@@ -79,25 +95,29 @@ app.controller('GameCtrl', ['$scope','$routeParams', 'dataSrvc', function ($scop
 			element.on('click',function(event){
 				event.preventDefault();
 				var countFlipped = checkFlippedCarts();
-				
-				switch(countFlipped){
-					case 0:
-						element.removeClass('cart-down').addClass('cart-flipped');
-						addFlippedCart(element);
-					break;
-					case 1:
-						element.removeClass('cart-down').addClass('cart-flipped');
-						addFlippedCart(element);
-						var cartValidation = compFlippedCart();
-						if(cartValidation){
-							openFlippedCarts();
-						}else{
+				if(element.hasClass('cart-down')){
+					switch(countFlipped){
+						case 0:
+							element.removeClass('cart-down').addClass('cart-flipped');
+							addFlippedCart(element);
+						break;
+						case 1:
+							element.removeClass('cart-down').addClass('cart-flipped');
+							addFlippedCart(element);
+							var cartValidation = compFlippedCart();
+							if(cartValidation){
+								openFlippedCarts();
+								if(gameFinished()){
+									stopTimer();
+								}
+							}else{
+								turnDownCarts();
+							}
+						break;
+						default:
 							turnDownCarts();
-						}
-					break;
-					default:
-						turnDownCarts();
-					break;
+						break;
+					}
 				}
 			});
 			
